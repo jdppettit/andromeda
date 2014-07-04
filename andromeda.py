@@ -100,39 +100,30 @@ class Pressure(db.Model):
                 self.date = date
 
 def getPressure():
-	pressureData = Pressure.query.order_by(Pressure.id.desc()).limit(720).all() 
-	return reversed(pressureData)
+	return Pressure.query.order_by(Pressure.id.asc()).first()
 
 def getOutsideTemp():
-	outsidetemp = OutsideTemperature.query.order_by(OutsideTemperature.id.desc()).limit(720).all()
-	return reversed(outsidetemp)
+	return OutsideTemperature.query.order_by(OutsideTemperature.id.asc()).first()
 
 def getOutsideHumidity():
-	outsidehumidity = OutsideHumidity.query.order_by(OutsideHumidity.id.desc()).limit(720).all()
-	return reversed(outsidehumidity)
+	return OutsideHumidity.query.order_by(OutsideHumidity.id.asc()).first()
 
 def getBedroomHumidity():
-	bedroomhumidity = BedroomHumidity.query.order_by(BedroomHumidity.id.desc()).limit(720).all()
-	return reversed(bedroomhumidity)
+	return BedroomHumidity.query.order_by(BedroomHumidity.id.asc()).first()
 
 def getBedroomTemp():
-	bedroomtemp = BedroomTemperature.query.order_by(BedroomTemperature.id.desc()).limit(720).all()
-	return reversed(bedroomtemp)
+	return BedroomTemperature.query.order_by(BedroomTemperature.id.asc()).first()
 
 def getHouseTemp():
-	housetemp = HouseTemperature.query.order_by(HouseTemperature.id.desc()).limit(720).all()
-	return reversed(housetemp)
+	return HouseTemperature.query.order_by(HouseTemperature.id.asc()).first()
 
 def getClosetTemp():
-	closettemp = ClosetTemperature.query.order_by(ClosetTemperature.id.desc()).limit(720).all()
-	return reversed(closettemp)
+	return ClosetTemperature.query.order_by(ClosetTemperature.id.asc()).first()
 
 def isOkay(queryItem):
-	lastDate = ""
-	for record in queryItem:
-		lastDate = record.date 
+        lastDate = queryItem.date
 	lastDateObj = datetime.datetime.strptime(lastDate, '%Y-%m-%d %X.%f')
-	warnTime = lastDateObj + datetime.timedelta(minutes=5)	
+	warnTime = lastDateObj + datetime.timedelta(minutes=5)
 	if warnTime < datetime.datetime.now():
 		return False, lastDate
 	else:
@@ -141,12 +132,10 @@ def isOkay(queryItem):
 def highLowHInt(queryItem):
 	high = 0
 	low = 0
-	for record in queryItem:
-		print "Ran once"
-		if record.humidity > high:
-			high = record.humidity
-		if record.humidity < low:
-			low = record.humidity
+        if queryItem.humidity > high:
+                high = queryItem.humidity
+        if queryItem.humidity < low:
+                low = queryItem.humidity
 	return high, low
 
 @app.route('/')
@@ -158,7 +147,7 @@ def index():
 	ot = getOutsideTemp()
 	oh = getOutsideHumidity()
 	p = getPressure()
-	
+
 	htStat, htLast = isOkay(ht)
 	ctStat, ctLast = isOkay(ct)
 	btStat, btLast = isOkay(bt)
@@ -166,11 +155,10 @@ def index():
 	otStat, otLast = isOkay(ot)
 	ohStat, ohLast = isOkay(oh)
 	pStat, pLast = isOkay(p)
-	
-	ohHigh, ohLow = highLowHInt(oh)	
+
+	ohHigh, ohLow = highLowHInt(oh)
 
 	return render_template('index.html', htStat=htStat, ctStat=ctStat, btStat=btStat, bhStat=bhStat, otStat=otStat, ohStat=ohStat, pStat=pStat, htLast=htLast, ctLast=ctLast, btLast=btLast, bhLast=bhLast, otLast=otLast, ohLast=ohLast,pLast=pLast, ohHigh = ohHigh, ohLow = ohLow)
 
 if __name__ == '__main__':
         app.run(host='0.0.0.0', port=80, debug=True)
-
