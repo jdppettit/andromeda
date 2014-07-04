@@ -6,6 +6,9 @@ from flask.ext.mail import *
 from credentials import *
 from password import *
 import datetime
+import json
+import requests
+from pytz import timezone
 from dateutil.relativedelta import relativedelta
 
 app = Flask(__name__)
@@ -18,8 +21,8 @@ class BedroomHumidity(db.Model):
 	__tablename__ = "bedroom_humidity"
 
 	id = db.Column(db.Integer, primary_key=True)
-	humidity = db.Column(db.String(15))
-	date = db.Column(db.String(30))
+	humidity = db.Column(db.Integer)
+	date = db.Column(db.Date)
 
 	def __init__(self, id, humidity, date):
 		self.id = id
@@ -31,7 +34,7 @@ class OutsideHumidity(db.Model):
 
         id = db.Column(db.Integer, primary_key=True)
         humidity = db.Column(db.Integer)
-        date = db.Column(db.String(30))
+        date = db.Column(db.Date)
 
         def __init__(self, id, humidity, date):
                 self.id = id
@@ -42,8 +45,8 @@ class OutsideTemperature(db.Model):
         __tablename__ = "outside_temp"
 
         id = db.Column(db.Integer, primary_key=True)
-        temp = db.Column(db.String(15))
-        date = db.Column(db.String(30))
+        temp = db.Column(db.Integer)
+        date = db.Column(db.Date)
 
         def __init__(self, id, temp, date):
                 self.id = id
@@ -54,8 +57,8 @@ class BedroomTemperature(db.Model):
         __tablename__ = "bedroom_temp"
 
         id = db.Column(db.Integer, primary_key=True)
-        temp = db.Column(db.String(15))
-        date = db.Column(db.String(30))
+        temp = db.Column(db.Integer)
+        date = db.Column(db.Date)
 
         def __init__(self, id, temp, date):
                 self.id = id
@@ -66,8 +69,8 @@ class ClosetTemperature(db.Model):
         __tablename__ = "closet_temp"
 
         id = db.Column(db.Integer, primary_key=True)
-        temp = db.Column(db.String(15))
-        date = db.Column(db.String(30))
+        temp = db.Column(db.Integer)
+        date = db.Column(db.Date)
 
         def __init__(self, id, temp, date):
                 self.id = id
@@ -79,8 +82,8 @@ class HouseTemperature(db.Model):
         __tablename__ = "house_temp"
 
         id = db.Column(db.Integer, primary_key=True)
-        temp = db.Column(db.String(15))
-        date = db.Column(db.String(30))
+        temp = db.Column(db.Integer)
+        date = db.Column(db.Date)
 
         def __init__(self, id, temp, date):
                 self.id = id
@@ -92,7 +95,7 @@ class Pressure(db.Model):
 
         id = db.Column(db.Integer, primary_key=True)
         pressure = db.Column(db.Integer)
-        date = db.Column(db.String(30))
+        date = db.Column(db.Date)
 
         def __init__(self, id, pressure, date):
                 self.id = id
@@ -100,57 +103,168 @@ class Pressure(db.Model):
                 self.date = date
 
 def getPressure():
-	pressureData = Pressure.query.order_by(Pressure.id.desc()).limit(720).all() 
-	return reversed(pressureData)
+	pressureData = Pressure.query.order_by(Pressure.id.asc()).limit(720).all() 
+	return pressureData
 
 def getOutsideTemp():
-	outsidetemp = OutsideTemperature.query.order_by(OutsideTemperature.id.desc()).limit(720).all()
-	return reversed(outsidetemp)
+	outsidetemp = OutsideTemperature.query.order_by(OutsideTemperature.id.asc()).limit(720).all()
+	return outsidetemp
 
 def getOutsideHumidity():
-	outsidehumidity = OutsideHumidity.query.order_by(OutsideHumidity.id.desc()).limit(720).all()
-	return reversed(outsidehumidity)
+	outsidehumidity = OutsideHumidity.query.order_by(OutsideHumidity.id.asc()).limit(720).all()
+	return outsidehumidity
 
 def getBedroomHumidity():
-	bedroomhumidity = BedroomHumidity.query.order_by(BedroomHumidity.id.desc()).limit(720).all()
-	return reversed(bedroomhumidity)
+	bedroomhumidity = BedroomHumidity.query.order_by(BedroomHumidity.id.asc()).limit(720).all()
+	return bedroomhumidity
 
 def getBedroomTemp():
-	bedroomtemp = BedroomTemperature.query.order_by(BedroomTemperature.id.desc()).limit(720).all()
-	return reversed(bedroomtemp)
+	bedroomtemp = BedroomTemperature.query.order_by(BedroomTemperature.id.asc()).limit(720).all()
+	return bedroomtemp
 
 def getHouseTemp():
-	housetemp = HouseTemperature.query.order_by(HouseTemperature.id.desc()).limit(720).all()
-	return reversed(housetemp)
+	housetemp = HouseTemperature.query.order_by(HouseTemperature.id.asc()).limit(720).all()
+	return housetemp
 
 def getClosetTemp():
-	closettemp = ClosetTemperature.query.order_by(ClosetTemperature.id.desc()).limit(720).all()
-	return reversed(closettemp)
+	closettemp = ClosetTemperature.query.order_by(ClosetTemperature.id.asc()).limit(720).all()
+	return closettemp
 
-def isOkay(queryItem):
-	lastDate = ""
-	for record in queryItem:
-		lastDate = record.date 
-	lastDateObj = datetime.datetime.strptime(lastDate, '%Y-%m-%d %X.%f')
-	warnTime = lastDateObj + datetime.timedelta(minutes=5)	
+# ------------
+
+def getPressureLast():
+        pressureData = Pressure.query.order_by(Pressure.id.desc()).limit(1).first()
+        return pressureData
+
+def getOutsideTempLast():
+        outsidetemp = OutsideTemperature.query.order_by(OutsideTemperature.id.desc()).limit(1).first()
+        return outsidetemp
+
+def getOutsideHumidityLast():
+        outsidehumidity = OutsideHumidity.query.order_by(OutsideHumidity.id.desc()).limit(1).first()
+        return outsidehumidity
+
+def getBedroomHumidityLast():
+        bedroomhumidity = BedroomHumidity.query.order_by(BedroomHumidity.id.desc()).limit(1).first()
+        return bedroomhumidity
+
+def getBedroomTempLast():
+        bedroomtemp = BedroomTemperature.query.order_by(BedroomTemperature.id.desc()).limit(1).first()
+        return bedroomtemp
+
+def getHouseTempLast():
+        housetemp = HouseTemperature.query.order_by(HouseTemperature.id.desc()).limit(1).first()
+        return housetemp
+
+def getClosetTempLast():
+        closettemp = ClosetTemperature.query.order_by(ClosetTemperature.id.desc()).limit(1).first()
+        return closettemp
+
+# ------------
+
+def isOkay(record):
+	lastDateObj = record.date 
+	warnTime = lastDateObj + datetime.timedelta(minutes=5)
+
+	try:
+		currentValue = record.humidity
+	except:
+		pass
+	
+	try: 
+		currentValue = record.temp
+	except:
+		pass
+
+	try:
+		currentValue = record.pressure
+	except:
+		pass
+	
 	if warnTime < datetime.datetime.now():
-		return False, lastDate
+		return False, str(lastDateObj), str(currentValue)
 	else:
-		return True, lastDate
+		return True, str(lastDateObj), str(currentValue)
 
-def highLowHInt(queryItem):
-	high = 0
-	low = 0
-	for record in queryItem:
-		print "Ran once"
-		if record.humidity > high:
-			high = record.humidity
-		if record.humidity < low:
-			low = record.humidity
-	return high, low
+def getHighLowPressure():
+	time = datetime.datetime.now() - datetime.timedelta(hours=24)
+	high = Pressure.query.filter(Pressure.date>=time).order_by(Pressure.pressure.asc()).first()
+	low = Pressure.query.filter(Pressure.date>=time).order_by(Pressure.pressure.desc()).first()
+	return high.pressure, low.pressure
 
+def getHighLowTemp(thing):
+	if thing == "ht":
+		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+		high = HouseTemperature.query.filter(HouseTemperature.date>=time).order_by(HouseTemperature.temp.asc()).first()
+		low = HouseTemperature.query.filter(HouseTemperature.date>=time).order_by(HouseTemperature.temp.desc()).first()
+		return high.temp, low.temp
+	elif thing == "bt":
+		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+                high = BedroomTemperature.query.filter(BedroomTemperature.date>=time).order_by(BedroomTemperature.temp.asc()).first()
+                low = BedroomTemperature.query.filter(BedroomTemperature.date>=time).order_by(BedroomTemperature.temp.desc()).first()
+                return high.temp, low.temp
+	elif thing == "ot":
+		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+                high = OutsideTemperature.query.filter(OutsideTemperature.date>=time).order_by(OutsideTemperature.temp.asc()).first()
+                low = OutsideTemperature.query.filter(OutsideTemperature.date>=time).order_by(OutsideTemperature.temp.desc()).first()
+                return high.temp, low.temp
+	elif thing == "ct":
+		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+                high = ClosetTemperature.query.filter(ClosetTemperature.date>=time).order_by(ClosetTemperature.temp.asc()).first()
+                low = ClosetTemperature.query.filter(ClosetTemperature.date>=time).order_by(ClosetTemperature.temp.desc()).first()
+                return high.temp, low.temp
+
+def getHighLowHumidity(thing):
+	if thing == "bh":
+		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+		high = BedroomHumidity.query.filter(BedroomHumidity.date>=time).order_by(BedroomHumidity.humidity.asc()).first()
+		low = BedroomHumidity.query.filter(BedroomHumidity.date>=time).order_by(BedroomHumidity.humidity.desc()).first()
+		return high.humidity, low.humidity
+	elif thing == "oh":
+		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+		high = OutsideHumidity.query.filter(OutsideHumidity.date>=time).order_by(OutsideHumidity.humidity.asc()).first()
+                low = OutsideHumidity.query.filter(OutsideHumidity.date>=time).order_by(OutsideHumidity.humidity.desc()).first()
+                return high.humidity, low.humidity
+
+def getPressureTrend():
+	time = datetime.datetime.now() - datetime.timedelta(hours=6)
+	pressureData = Pressure.query.filter(Pressure.date>=time).all()
+	numIncreased = 0
+	numDecreased = 0
+	highHold = 0
+	lowHold = 0
+	for row in pressureData:
+		if row.pressure > highHold:
+			highHold = row.pressure
+			numIncreased = numIncreased + 1
+		if row.pressure < lowHold:
+			lowHold = row.pressure
+			numDecreased = numDecreased + 1
+	if numIncreased > numDecreased:
+		return 1
+	elif numDecreased > numIncreased:
+		return 0
+	else:
+		return 2
+
+def getNagiosJSON():
+	requestString = "https://andromeda.pettitservers.com:8080/state/"
+	r = requests.get(requestString)
+	json = r.json()
+	nagiosStatus = {}
+	for host in json['hosts']:
+		nagiosStatus[json['hosts'][host]['host_name']] = json['hosts'][host]['current_state']
+	return nagiosStatus
+
+@app.route('/graphs')
+def graphs():
+	return render_template("graphs.html")
+
+@app.route('/dashboard')
 @app.route('/')
 def index():
+	nagiosStatus = getNagiosJSON()
+
 	ht = getHouseTemp()
 	ct = getClosetTemp()
 	bt = getBedroomTemp()
@@ -159,17 +273,25 @@ def index():
 	oh = getOutsideHumidity()
 	p = getPressure()
 	
-	htStat, htLast = isOkay(ht)
-	ctStat, ctLast = isOkay(ct)
-	btStat, btLast = isOkay(bt)
-	bhStat, bhLast = isOkay(bh)
-	otStat, otLast = isOkay(ot)
-	ohStat, ohLast = isOkay(oh)
-	pStat, pLast = isOkay(p)
+	htStat, htLast, htCurrent = isOkay(getHouseTempLast())
+	ctStat, ctLast, ctCurrent = isOkay(getClosetTempLast())
+	btStat, btLast, btCurrent = isOkay(getBedroomTempLast())
+	bhStat, bhLast, bhCurrent = isOkay(getBedroomHumidityLast())
+	otStat, otLast, otCurrent = isOkay(getOutsideTempLast())
+	ohStat, ohLast, ohCurrent = isOkay(getOutsideHumidityLast())
+	pStat, pLast, pCurrent = isOkay(getPressureLast())
 	
-	ohHigh, ohLow = highLowHInt(oh)	
+	ohHigh, ohLow = getHighLowHumidity("oh")
+	bhHigh, bhLow = getHighLowHumidity("bh")
+	htHigh, htLow = getHighLowTemp("ht")
+	btHigh, btLow = getHighLowTemp("bt")
+	otHigh, otLow = getHighLowTemp("ot")
+	pHigh, pLow = getHighLowPressure()	
+	ctHigh, ctLow = getHighLowTemp("ct")
 
-	return render_template('index.html', htStat=htStat, ctStat=ctStat, btStat=btStat, bhStat=bhStat, otStat=otStat, ohStat=ohStat, pStat=pStat, htLast=htLast, ctLast=ctLast, btLast=btLast, bhLast=bhLast, otLast=otLast, ohLast=ohLast,pLast=pLast, ohHigh = ohHigh, ohLow = ohLow)
+	trend = getPressureTrend()	
+
+	return render_template('index.html', htStat=htStat, ctStat=ctStat, btStat=btStat, bhStat=bhStat, otStat=otStat, ohStat=ohStat, htLast=htLast, ctLast=ctLast, btLast=btLast, bhLast=bhLast, otLast=otLast, ohLast=ohLast, pHigh = pHigh, pLow = pLow, pStat = pStat, pLast = pLast, pCurrent = pCurrent, htCurrent = htCurrent, ctCurrent = ctCurrent, btCurrent = btCurrent, bhCurrent = bhCurrent, otCurrent = otCurrent, ohCurrent = ohCurrent, ohHigh = ohHigh, ohLow = ohLow, bhHigh = bhHigh, bhLow = bhLow, htHigh = htHigh, htLow = htLow, btHigh = btHigh, btLow = btLow, otHigh = otHigh, otLow = otLow, nagiosStatus=nagiosStatus, trend=trend, ctHigh = ctHigh, ctLow = ctLow)
 
 if __name__ == '__main__':
         app.run(host='0.0.0.0', port=80, debug=True)

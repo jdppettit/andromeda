@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Dark Admin</title>
+    <title>andromeda</title>
 
     <link rel="stylesheet" type="text/css" href="static/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="static/font-awesome/css/font-awesome.min.css" />
@@ -20,6 +20,12 @@
 
     <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
     <script type="text/javascript" src="http://www.prepbootstrap.com/Content/js/gridData.js"></script>
+    <style>
+	hr {
+		margin-top:5px;
+		margin-bottom:5px;
+	}
+    </style>
 </head>
 <body>
 
@@ -38,12 +44,11 @@
 
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul id="active" class="nav navbar-nav side-nav">
-                    <li class="selected"><a href="index.html"><i class="fa fa-bullseye"></i> Dashboard</a></li>
-                    <li><a href="portfolio.html"><i class="fa fa-tasks"></i> Weather Data</a></li>
-                    <li><a href="blog.html"><i class="fa fa-globe"></i> Weather Graphs</a></li>
-                </ul>
-
-                <ul class="nav navbar-nav navbar-right navbar-user">
+                    <li class="selected"><a href="/dashboard"><i class="fa fa-bullseye"></i> Dashboard</a></li>
+                    <li><a href="/graphs"><i class="glyphicon glyphicon-stats"></i> Graphs</a></li>
+		    <li><a href="https://andromeda.pettitservers.com:8080/nagios3"><i class="glyphicon glyphicon-eye-open"></i> Nagios</a></li>
+		    <li><a href="https://jpet.us/rc"><i class="glyphicon glyphicon-envelope"></i> Webmail</a></li>
+		    <li><a href="https://jpet.us/oc"><i class="glyphicon glyphicon-cloud"></i> ownCloud</a></li>
                 </ul>
             </div>
         </nav>
@@ -51,53 +56,51 @@
         <div id="page-wrapper">
 
             <div class="row">
-                <div class="col-lg-4">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h3 class="panel-title"><i class="glyphicon glyphicon-stats"></i> Monitoring Status</h3>
+		<div class="col-lg-4">
+                                <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                                <h3 class="panel-title"><i class="glyphicon glyphicon-dashboard"></i> Pressure</h3>
+                                        </div>
+                                <table class="table">
+                                        <tr>
+                                                <th>Pressure</th>
+                                                <th>{{ pCurrent }} mPa</th>
+                                        </tr>
+                                </table>
+				<hr/>
+                                <table class="table">
+                                        <tr>
+                                                <th>Presure - Last 24 Hrs</th>
+                                                <th>Low</th>
+                                                <th>High</th>
+                                        </tr>
+                                        <tr>
+                                                <td></td>
+                                                <td>{{ pHigh }} mPa</td>
+                                                <td>{{ pLow }} mPa</td>
+                                        </tr>
+                                </table>
+				<hr/>
+				<table class="table">
+					<tr>
+						<th>Pressure Trend - Last 6 Hrs</th>
+						<th>Direction</th>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							{% if trend == 0 %}
+							<span class="glyphicon glyphicon-arrow-down"></span> Downward
+							{% elif trend == 1 %}
+							<span class="glyphicon glyphicon-arrow-up"></span> Upward
+							{% else %}
+							<span class="glyphicon glyphicon-arrow-alt"></span> Stagnant
+							{% endif %}
+						</td>
+					</tr>
+				</table>
+                                </div>
                         </div>
-			<table class="table">
-				<tr><td>Monitor</td><td>Status</td><td>Last Reported</td></tr>
-				<tr>
-					<td>Bedroom - Humidity</td>
-					<td>{% if bhStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
-					<td>{{ bhLast }}</td>
-				</tr>
-				 <tr>
-                                        <td>Bedroom - Temperature</td>
-                                        <td>{% if btStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
-                                        <td>{{ btLast }}</td>
-                                </tr>
-				 <tr>
-                                        <td>Outside - Humidity</td>
-                                        <td>{% if ohStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
-                                        <td>{{ ohLast }}</td>
-                                </tr>
-				 <tr>
-                                        <td>Outside - Temperature</td>
-                                        <td>{% if otStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
-                                        <td>{{ otLast }}</td>
-                                </tr>
-				 <tr>
-                                        <td>Closet - Temperature</td>
-                                        <td>{% if ctStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
-                                        <td>{{ ctLast }}</td>
-                                </tr>
-				<tr>
-                                        <td>House - Temperature</td>
-                                        <td>{% if htStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
-                                        <td>{{ htLast }}</td>
-                                </tr>
-				 <tr>
-                                        <td>Pressure</td>
-                                        <td>{% if pStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
-                                        <td>{{ pLast }}</td>
-                                </tr>
-
-			</table>	
-                    </div>
-
-                </div>
                 <div class="col-lg-4">
 
 			<div class="panel panel-primary">
@@ -106,14 +109,41 @@
 				</div>
 			<table class="table">
 				<tr>
-					<td>Humidity</td>
-					<td>High</td>
-					<td>Low</td>
+					<th width="70%">Temperature</th>
+					<th>{{ otCurrent }}&deg; f</th>
+				</tr>
+			</table>
+			<hr/>
+			<table class="table">
+                                <tr>
+                                        <th width="60%">Temperature - Last 24 Hrs</th>
+                                        <th>Low</th>
+					<th>High</th>
+                                </tr>
+				<tr>
+					<td></td>
+					<td>{{ otHigh }}&deg; f</td>
+					<td>{{ otLow }}&deg; f</td>
+				</tr>
+                        </table>
+			<hr/>
+			<table class="table">
+				<tr>
+					<th width="70%">Humidity</th>
+					<th>{{ ohCurrent }}%</th>
+				</tr>
+			</table>
+			<hr/>
+			<table class="table">
+				<tr>
+					<th width="60%">Humidity - Last 24 Hrs</th>
+					<th>Low</th>
+					<th>High</th>
 				</tr>
 				<tr>
 					<td></td>
-					<td>{{ ohHigh }}</td>
-					<td>{{ ohLow }}</td>
+					<td>{{ ohHigh }}%</td>
+					<td>{{ ohLow }}%</td>
 				</tr>
 			</table>
 			</div>
@@ -124,11 +154,139 @@
                                 <div class="panel-heading">
                                 	<h3 class="panel-title"><i class="glyphicon glyphicon-home"></i> Inside Conditions</h3>
 				</div>
-                        Body
+                        <table class="table">
+				<tr>
+					<th width="50%">Location</th>
+					<th>Temperature</th>
+				</tr>
+				<tr>
+					<td>Bedroom</td>
+					<td>{{ btCurrent }}&deg; f</td>
+				</tr>
+				<tr>
+					<td>House</td>
+					<td>{{ htCurrent }}&deg; f</td>
+				</tr>
+				<tr>
+					<td>Closet</td>
+					<td>{{ ctCurrent }}&deg; f</td>
+				</tr>
+			</table>
+			<hr/>
+			<table class="table">
+				<tr>
+					<th width="50%">Location - Last 24 Hrs</th>
+					<th>Low</th>
+					<th>High</th>
+				</tr>
+				<tr>
+					<td>Bedroom</td>
+					<td>{{ btHigh }}&deg; f</td>
+					<td>{{ btLow }}&deg; f</td>
+				</tr>
+				<tr>
+					<td>House</td>
+					<td>{{ htHigh }}&deg; f</td>
+					<td>{{ htLow }}&deg; f</td>
+				</tr>
+				<tr>
+					<td>Closet</td>
+					<td>{{ ctHigh }}&deg; f</td>
+					<td>{{ ctLow }}&deg; f</td>
+				</tr>
+			</table>
                         </div>
-                </div>
+		</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="glyphicon glyphicon-stats"></i> Monitoring Status</h3>
+                        </div>
+                        <table class="table">
+                                <tr><th>Monitor</td><th>Status</td><th>Last Reported</td></tr>
+                                <tr>
+                                        <td>Bedroom - Humidity</td>
+                                        <td>{% if bhStat == True %}<span class="glyphicon glyphicon-ok" style="color: green">{% else %}<span class="glyphicon glyphicon-remove" style="color: red">{% endif %}</td>
+                                        <td>{{ bhLast }}</td>
+                                </tr>
+                                 <tr>
+                                        <td>Bedroom - Temperature</td>
+                                        <td>{% if btStat == True %}<span class="glyphicon glyphicon-ok" style="color: green">{% else %}<span class="glyphicon glyphicon-remove" style="color: red">{% endif %}</td>
+                                        <td>{{ btLast }}</td>
+                                </tr>
+                                 <tr>
+                                        <td>Outside - Humidity</td>
+                                        <td>{% if ohStat == True %}<span class="glyphicon glyphicon-ok" style="color: green">{% else %}<span class="glyphicon glyphicon-remove" style="color: red">{% endif %}</td>
+                                        <td>{{ ohLast }}</td>
+                                </tr>
+                                 <tr>
+                                        <td>Outside - Temperature</td>
+                                        <td>{% if otStat == True %}<span class="glyphicon glyphicon-ok" style="color: green">{% else %}<span class="glyphicon glyphicon-remove" style="color: red">{% endif %}</td>
+                                        <td>{{ otLast }}</td>
+                                </tr>
+                                 <tr>
+                                        <td>Closet - Temperature</td>
+                                        <td>{% if ctStat == True %}<span class="glyphicon glyphicon-ok" style="color: green">{% else %}<span class="glyphicon glyphicon-remove" style="color: red">{% endif %}</td>
+                                        <td>{{ ctLast }}</td>
+                                </tr>
+                                <tr>
+                                        <td>House - Temperature</td>
+                                        <td>{% if htStat == True %}<span class="glyphicon glyphicon-ok" style="color: green">{% else %}<span class="glyphicon glyphicon-remove" style="color: red">{% endif %}</td>
+                                        <td>{{ htLast }}</td>
+                                </tr>
+                                 <tr>
+                                        <td>Pressure</td>
+                                        <td>{% if pStat == True %}<span class="glyphicon glyphicon-ok" style="color: green">{% else %}<span class="glyphicon glyphicon-remove" style="color: red">{% endif %}</td>
+                                        <td>{{ pLast }}</td>
+                                </tr>
 
-            </div>
+                        </table>
+                    </div>
+		</div>
+
+
+			<div class="col-lg-4">
+				 <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                                <h3 class="panel-title"><i class="glyphicon glyphicon-dashboard"></i> Host Status</h3>
+                                        </div>
+					<table class="table">
+						<tr>
+							<th>Hostname</th>
+							<th>Status</th>
+						</tr>
+						{% for host, status in nagiosStatus.iteritems() %}
+						<tr>
+							<td>{{ host }}</td>
+							<td>
+								{% if status == "0" %}
+									<span class="glyphicon glyphicon-ok-sign" style="color: green"></span>
+								{% elif status == "1" %}
+									<span class="glyphicon glyphicon-question-sign" style="color: yellow"></span>
+								{% elif status == "2" %}
+									<span class="glyphicon glyphicon-remove-sign" style="color: red"></span>	
+								{% elif status == "3" %}
+									<span class="glyphicon glyphicon-question-sign" style="color: blue"></span>
+								{% endif %}
+							</td>
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+			<div class="col-lg-4">
+				 <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                               <h3 class="panel-title"><i class="glyphicon glyphicon-dashboard"></i> Times</h3>
+                                        </div>
+					<div style="text-align:center; padding-top: 10px; padding-bottom: 10px;">
+					<iframe scrolling="no" frameborder="no" style="overflow:hidden;border:0;margin:0;padding:0;width:480px;height:250px;" src="http://www.clocklink.com/clocks/HTML5/html5-world.html?New_York&Denver&Beijing&480&gray"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
         </div>
 
     </div>
