@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Dark Admin</title>
+
+    <link rel="stylesheet" type="text/css" href="static/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="static/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="static/css/local.css" />
+
+    <script type="text/javascript" src="static/js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="static/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- you need to include the shieldui css and js assets in order for the charts to work -->
+    <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/shieldui-all.min.css" />
+    <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light-bootstrap/all.min.css" />
+    <link id="gridcss" rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/dark-bootstrap/all.min.css" />
+
+    <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
+    <script type="text/javascript" src="http://www.prepbootstrap.com/Content/js/gridData.js"></script>
+</head>
+<body>
+
+    <div id="wrapper">
+
+          <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">andromeda</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul id="active" class="nav navbar-nav side-nav">
+                    <li class="selected"><a href="index.html"><i class="fa fa-bullseye"></i> Dashboard</a></li>
+                    <li><a href="portfolio.html"><i class="fa fa-tasks"></i> Weather Data</a></li>
+                    <li><a href="blog.html"><i class="fa fa-globe"></i> Weather Graphs</a></li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right navbar-user">
+                </ul>
+            </div>
+        </nav>
+
+        <div id="page-wrapper">
+
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="glyphicon glyphicon-stats"></i> Monitoring Status</h3>
+                        </div>
+			<table class="table">
+				<tr><td>Monitor</td><td>Status</td><td>Last Reported</td></tr>
+				<tr>
+					<td>Bedroom - Humidity</td>
+					<td>{% if bhStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
+					<td>{{ bhLast }}</td>
+				</tr>
+				 <tr>
+                                        <td>Bedroom - Temperature</td>
+                                        <td>{% if btStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
+                                        <td>{{ btLast }}</td>
+                                </tr>
+				 <tr>
+                                        <td>Outside - Humidity</td>
+                                        <td>{% if ohStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
+                                        <td>{{ ohLast }}</td>
+                                </tr>
+				 <tr>
+                                        <td>Outside - Temperature</td>
+                                        <td>{% if otStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
+                                        <td>{{ otLast }}</td>
+                                </tr>
+				 <tr>
+                                        <td>Closet - Temperature</td>
+                                        <td>{% if ctStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
+                                        <td>{{ ctLast }}</td>
+                                </tr>
+				<tr>
+                                        <td>House - Temperature</td>
+                                        <td>{% if htStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
+                                        <td>{{ htLast }}</td>
+                                </tr>
+				 <tr>
+                                        <td>Pressure</td>
+                                        <td>{% if pStat == True %}<span class="glyphicon glyphicon-ok">{% else %}<span class="glyphicon glyphicon-remove">{% endif %}</td>
+                                        <td>{{ pLast }}</td>
+                                </tr>
+
+			</table>	
+                    </div>
+
+                </div>
+                <div class="col-lg-4">
+
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title"><i class="glyphicon glyphicon-tree-conifer"></i> Outside Conditions</h3>
+				</div>
+			<table class="table">
+				<tr>
+					<td>Humidity</td>
+					<td>High</td>
+					<td>Low</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>{{ ohHigh }}</td>
+					<td>{{ ohLow }}</td>
+				</tr>
+			</table>
+			</div>
+                </div>
+		<div class="col-lg-4">
+
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                	<h3 class="panel-title"><i class="glyphicon glyphicon-home"></i> Inside Conditions</h3>
+				</div>
+                        Body
+                        </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <!-- /#wrapper -->
+</body>
+</html>
