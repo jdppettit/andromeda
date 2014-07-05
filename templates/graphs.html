@@ -20,6 +20,75 @@
 
     <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
     <script type="text/javascript" src="http://www.prepbootstrap.com/Content/js/gridData.js"></script>
+    <script type="text/javascript">
+	$(document).ready(function() {
+		makePressure6hr();
+		makePressure24hr();
+		makePressure7day();
+	});	
+	function makePressure6hr() {
+		var dataVar = [{% for row in pressure6hr %}{{ row.pressure }},{% endfor %}];
+                var datesVar = [{% for row in pressure6hr %}"{{ row.date }}",{% endfor %}];
+		$("#pressure-6-hr").highcharts({		
+		title: {
+			text: ""
+		},
+		xAxis: {
+			categories: datesVar,
+				labels: {
+					staggerLines: 5,
+					enabled: false
+				}
+		},
+		yAxis: {
+			title: {
+				text: "Pressure (mPa)"
+			},
+			plotLines: [{
+                	    value: 0,
+               		    width: 1,
+            	            color: '#808080'
+                	}]
+            	},
+		series: [{
+			name: 'Pressure',
+			data: dataVar
+		}]
+		});
+	};
+	function makePressure24hr() {
+		var dataVar = [{% for row in pressure24hr %}{{ row.pressure }},{% endfor %}];
+		var datesVar = [{% for row in pressure24hr %}"{{ row.date }}",{% endfor %}];
+		$("#pressure-24-hr").highcharts({
+                title: {
+                        text: ""
+                },
+                xAxis: {
+                        categories: datesVar,
+                                labels: {
+                                        staggerLines: 5,
+                                        enabled: false
+                                },
+				tickInterval: 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 60 * 3600 * 1000
+                },
+                yAxis: {
+                        title: {
+                                text: "Pressure (mPa)"
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                },
+                series: [{
+                        name: 'Pressure',
+                        data: dataVar
+                }]
+                });
+
+	};
+    </script>
     <style>
 	hr {
 		margin-top:5px;
@@ -28,7 +97,9 @@
     </style>
 </head>
 <body>
-
+    <script type="text/javascript" src="{{ url_for('static',filename='js/highcharts.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='js/modules/exporting.js') }}"></script>
+    <script type="text/javascript" src="/static/js/themes/dark-unica.js"></script>
     <div id="wrapper">
 
           <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -56,7 +127,31 @@
         <div id="page-wrapper">
 
             <div class="row">
+		<div class="col-lg-4">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">Pressure - 6 Hour</h3>
+				</div>
+				<div id="pressure-6-hr"></div>
+			</div>
 		</div>
+		<div class="col-lg-4">
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                        <h3 class="panel-title">Pressure - 24 Hour</h3>
+                                </div>
+                                <div id="pressure-24-hr"></div>
+                        </div>
+                </div>
+		<div class="col-lg-4">
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                        <h3 class="panel-title">Pressure - 7 Days</h3>
+                                </div>
+                                <div id="pressure-7-day"></div>
+                        </div>
+                </div>
+	    </div>
         </div>
 
     </div>

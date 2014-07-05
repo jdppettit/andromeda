@@ -186,45 +186,50 @@ def isOkay(record):
 	else:
 		return True, str(lastDateObj), str(currentValue)
 
-def getHighLowPressure():
-	time = datetime.datetime.now() - datetime.timedelta(hours=24)
+def getHighLowPressure(hrs):
+	time = datetime.datetime.now() - datetime.timedelta(hours=hrs)
 	high = Pressure.query.filter(Pressure.date>=time).order_by(Pressure.pressure.asc()).first()
 	low = Pressure.query.filter(Pressure.date>=time).order_by(Pressure.pressure.desc()).first()
 	return high.pressure, low.pressure
 
-def getHighLowTemp(thing):
+def getHighLowTemp(thing, hrs):
 	if thing == "ht":
-		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+		time = datetime.datetime.now() - datetime.timedelta(hours=hrs)
 		high = HouseTemperature.query.filter(HouseTemperature.date>=time).order_by(HouseTemperature.temp.asc()).first()
 		low = HouseTemperature.query.filter(HouseTemperature.date>=time).order_by(HouseTemperature.temp.desc()).first()
 		return high.temp, low.temp
 	elif thing == "bt":
-		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+		time = datetime.datetime.now() - datetime.timedelta(hours=hrs)
                 high = BedroomTemperature.query.filter(BedroomTemperature.date>=time).order_by(BedroomTemperature.temp.asc()).first()
                 low = BedroomTemperature.query.filter(BedroomTemperature.date>=time).order_by(BedroomTemperature.temp.desc()).first()
                 return high.temp, low.temp
 	elif thing == "ot":
-		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+		time = datetime.datetime.now() - datetime.timedelta(hours=hrs)
                 high = OutsideTemperature.query.filter(OutsideTemperature.date>=time).order_by(OutsideTemperature.temp.asc()).first()
                 low = OutsideTemperature.query.filter(OutsideTemperature.date>=time).order_by(OutsideTemperature.temp.desc()).first()
                 return high.temp, low.temp
 	elif thing == "ct":
-		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+		time = datetime.datetime.now() - datetime.timedelta(hours=hrs)
                 high = ClosetTemperature.query.filter(ClosetTemperature.date>=time).order_by(ClosetTemperature.temp.asc()).first()
                 low = ClosetTemperature.query.filter(ClosetTemperature.date>=time).order_by(ClosetTemperature.temp.desc()).first()
                 return high.temp, low.temp
 
-def getHighLowHumidity(thing):
+def getHighLowHumidity(thing, hrs):
 	if thing == "bh":
-		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+		time = datetime.datetime.now() - datetime.timedelta(hours=hrs)
 		high = BedroomHumidity.query.filter(BedroomHumidity.date>=time).order_by(BedroomHumidity.humidity.asc()).first()
 		low = BedroomHumidity.query.filter(BedroomHumidity.date>=time).order_by(BedroomHumidity.humidity.desc()).first()
 		return high.humidity, low.humidity
 	elif thing == "oh":
-		time = datetime.datetime.now() - datetime.timedelta(hours=24)
+		time = datetime.datetime.now() - datetime.timedelta(hours=hrs)
 		high = OutsideHumidity.query.filter(OutsideHumidity.date>=time).order_by(OutsideHumidity.humidity.asc()).first()
                 low = OutsideHumidity.query.filter(OutsideHumidity.date>=time).order_by(OutsideHumidity.humidity.desc()).first()
                 return high.humidity, low.humidity
+
+def getAllPressure(hrs):
+	time = datetime.datetime.now() - datetime.timedelta(hours=hrs)
+        allPressure = Pressure.query.filter(Pressure.date>=time).order_by(Pressure.pressure.asc()).all()
+        return allPressure
 
 def getPressureTrend():
 	time = datetime.datetime.now() - datetime.timedelta(hours=6)
@@ -258,7 +263,9 @@ def getNagiosJSON():
 
 @app.route('/graphs')
 def graphs():
-	return render_template("graphs.html")
+	pressure6hr = getAllPressure(6)
+	pressure24hr = getAllPressure(24)
+	return render_template("graphs.html", pressure6hr = pressure6hr, pressure24hr = pressure24hr)
 
 @app.route('/dashboard')
 @app.route('/')
@@ -281,13 +288,13 @@ def index():
 	ohStat, ohLast, ohCurrent = isOkay(getOutsideHumidityLast())
 	pStat, pLast, pCurrent = isOkay(getPressureLast())
 	
-	ohHigh, ohLow = getHighLowHumidity("oh")
-	bhHigh, bhLow = getHighLowHumidity("bh")
-	htHigh, htLow = getHighLowTemp("ht")
-	btHigh, btLow = getHighLowTemp("bt")
-	otHigh, otLow = getHighLowTemp("ot")
+	ohHigh, ohLow = getHighLowHumidity("oh", 24)
+	bhHigh, bhLow = getHighLowHumidity("bh", 24)
+	htHigh, htLow = getHighLowTemp("ht", 24)
+	btHigh, btLow = getHighLowTemp("bt", 24)
+	otHigh, otLow = getHighLowTemp("ot", 24)
 	pHigh, pLow = getHighLowPressure()	
-	ctHigh, ctLow = getHighLowTemp("ct")
+	ctHigh, ctLow = getHighLowTemp("ct", 24)
 
 	trend = getPressureTrend()	
 
