@@ -88,6 +88,39 @@
                 });
 
 	};
+	function makePressure7day() {
+                var dataVar = [{% for row in pressure7day %}{{ row.pressure }},{% endfor %}];
+                var datesVar = [{% for row in pressure7day %}"{{ row.date }}",{% endfor %}];
+                $("#pressure-7-day").highcharts({
+                title: {
+                        text: ""
+                },
+                xAxis: {
+                        categories: datesVar,
+                                labels: {
+                                        staggerLines: 5,
+                                        enabled: false
+                                },
+                                tickInterval: 3600 * 1000
+                },
+                yAxis: {
+                        title: {
+                                text: "Pressure (mPa)"
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                },
+                series: [{
+                        name: 'Pressure',
+                        data: dataVar
+                }]
+                });
+
+        };
+
     </script>
     <style>
 	hr {

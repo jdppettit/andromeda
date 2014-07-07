@@ -2,12 +2,14 @@ from flask import *
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.mail import *
+from functools import wraps
 
 from credentials import *
 from password import *
 import datetime
 import json
 import requests
+from numpy import *
 from pytz import timezone
 from dateutil.relativedelta import relativedelta
 
@@ -101,6 +103,29 @@ class Pressure(db.Model):
                 self.id = id
                 self.pressure = pressure
                 self.date = date
+
+
+def check_auth(username, password):
+    """This function is called to check if a username /
+    password combination is valid.
+    """
+    return username == ADMIN_USER and password == ADMIN_PASSWORD
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
 
 def getPressure():
 	pressureData = Pressure.query.order_by(Pressure.id.asc()).limit(720).all() 
@@ -231,6 +256,17 @@ def getAllPressure(hrs):
         allPressure = Pressure.query.filter(Pressure.date>=time).order_by(Pressure.pressure.asc()).all()
         return allPressure
 
+def getAllRecords():
+	bt = BedroomTemperature.query.all()
+	bh = BedroomHumidity.query.all()
+	ot = OutsideTemperature.query.all()
+	oh = OutsideHumidity.query.all()
+	ct = ClosetTemperature.query.all()
+	ht = HouseTemperature.query.all()
+	p = Pressure.query.all()
+
+	return bt, bh, ot, oh, ct, ht, p
+
 def getPressureTrend():
 	time = datetime.datetime.now() - datetime.timedelta(hours=6)
 	pressureData = Pressure.query.filter(Pressure.date>=time).all()
@@ -252,6 +288,64 @@ def getPressureTrend():
 	else:
 		return 2
 
+def stripOutliers(queryItem, itemType, magnitude):
+	mean, length = getTemperatureMean(queryItem)
+	stdevh = 0
+        stdevh = std(queryItem)
+        effectivestdev = stdevh * magnitude
+	counter = 0
+	if itemType == "temp":
+		for item in queryItem:
+			if item.temp > mean + effectivestdev or item.temp < mean - effectivestdev:
+				pass
+			else:
+				db.session.delete(item)
+				counter += 1
+		db.session.commit()
+		return counter
+	elif itemType == "humidity":
+		for item in queryItem:
+			if item.humidity > mean + effectivestdev or item.humidity < mean - effectivestdev:
+				pass
+			else:
+				db.session.delete(item)
+				counter += 1
+		db.session.commit()
+		return counter
+	elif itemType == "pressure":
+		for item in queryItem:
+                        if item.pressure > mean + effectivestdev or item.humidity < mean - effectivestdev:
+                                pass
+                        else:
+                                db.session.delete(item)
+				counter += 1
+		db.session.commit()
+		return counter
+
+def getHumidityMean(queryItem):
+	itemLength = len(queryItem)
+	total = 0
+	for item in queryItem:
+		total = total + item.humidity
+	mean = total / itemLength
+	return mean, itemLength	
+
+def getTemperatureMean(queryItem):
+	itemLength = len(queryItem)
+        total = 0
+        for item in queryItem:
+                total = total + int(item.temp)
+        mean = total / itemLength
+        return mean, itemLength
+
+def getPressureMean(queryItem):
+	itemLength = len(queryItem)
+        total = 0
+        for item in queryItem:
+                total = total + item.pressure
+        mean = total / itemLength
+        return mean, itemLength
+
 def getNagiosJSON():
 	requestString = "https://andromeda.pettitservers.com:8080/state/"
 	r = requests.get(requestString)
@@ -262,13 +356,16 @@ def getNagiosJSON():
 	return nagiosStatus
 
 @app.route('/graphs')
+@requires_auth
 def graphs():
 	pressure6hr = getAllPressure(6)
 	pressure24hr = getAllPressure(24)
-	return render_template("graphs.html", pressure6hr = pressure6hr, pressure24hr = pressure24hr)
+	pressure7day = getAllPressure(168)
+	return render_template("graphs.html", pressure6hr = pressure6hr, pressure24hr = pressure24hr, pressure7day = pressure7day)
 
 @app.route('/dashboard')
 @app.route('/')
+@requires_auth
 def index():
 	nagiosStatus = getNagiosJSON()
 
@@ -293,13 +390,22 @@ def index():
 	htHigh, htLow = getHighLowTemp("ht", 24)
 	btHigh, btLow = getHighLowTemp("bt", 24)
 	otHigh, otLow = getHighLowTemp("ot", 24)
-	pHigh, pLow = getHighLowPressure()	
+	pHigh, pLow = getHighLowPressure(24)	
 	ctHigh, ctLow = getHighLowTemp("ct", 24)
 
 	trend = getPressureTrend()	
 
 	return render_template('index.html', htStat=htStat, ctStat=ctStat, btStat=btStat, bhStat=bhStat, otStat=otStat, ohStat=ohStat, htLast=htLast, ctLast=ctLast, btLast=btLast, bhLast=bhLast, otLast=otLast, ohLast=ohLast, pHigh = pHigh, pLow = pLow, pStat = pStat, pLast = pLast, pCurrent = pCurrent, htCurrent = htCurrent, ctCurrent = ctCurrent, btCurrent = btCurrent, bhCurrent = bhCurrent, otCurrent = otCurrent, ohCurrent = ohCurrent, ohHigh = ohHigh, ohLow = ohLow, bhHigh = bhHigh, bhLow = bhLow, htHigh = htHigh, htLow = htLow, btHigh = btHigh, btLow = btLow, otHigh = otHigh, otLow = otLow, nagiosStatus=nagiosStatus, trend=trend, ctHigh = ctHigh, ctLow = ctLow)
 
+@app.route('/utils/outliers')
+@requires_auth
+def outliers():
+	bt, bh, ot, oh, ct, ht, p = getAllRecords()
+	
+	btCount = stripOutliers(bt, "temp", 1)
+
+	return "Deleted %i rows" % btCount
+	
 if __name__ == '__main__':
         app.run(host='0.0.0.0', port=80, debug=True)
 
