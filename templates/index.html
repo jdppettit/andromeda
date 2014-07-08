@@ -26,8 +26,260 @@
 		margin-bottom:5px;
 	}
     </style>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			makeCurrentPressure();
+			makeCurrentOutsideTemp();
+			makeCurrentOutsideHum();
+		});
+		function makeCurrentOutsideHum() {
+                        var gaugeOptions = {
+
+            chart: {
+                type: 'solidgauge'
+            },
+
+            title: null,
+
+            pane: {
+                center: ['50%', '85%'],
+                size: '95%',
+                startAngle: -90,
+                endAngle: 90,
+            background: {
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+            },
+
+            tooltip: {
+                enabled: true
+            },
+
+            // the value axis
+            yAxis: {
+                        stops: [
+                                [0.1, '#55BF3B'], // green
+                        [0.5, '#DDDF0D'], // yellow
+                        [0.9, '#DF5353'] // red
+                        ],
+                        lineWidth: 0,
+            minorTickInterval: null,
+            tickPixelInterval: 400,
+            tickWidth: 0,
+                title: {
+                y: -70
+                },
+            labels: {
+                y: 16
+            }
+            },
+
+        plotOptions: {
+            solidgauge: {
+                dataLabels: {
+                    y: 5,
+                    borderWidth: 0,
+                    useHTML: true
+                }
+            }
+        }
+    };
+	   // The speed gauge
+    $('#current-outside-humidity').highcharts(Highcharts.merge(gaugeOptions, {
+        yAxis: {
+                min: 0,
+                max: 100,
+                title: {
+                    text: ''
+                }
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            series: [{
+                name: 'Outside Humidity',
+                data: [{{ ohCurrent }}],
+                tooltip: {
+                        valueSuffix: '%'
+                }
+            }]
+
+        }));
+                };
+
+		function makeCurrentOutsideTemp() {
+                        var gaugeOptions = {
+
+            chart: {
+                type: 'solidgauge'
+            },
+
+            title: null,
+
+            pane: {
+                center: ['50%', '85%'],
+                size: '95%',
+                startAngle: -90,
+                endAngle: 90,
+            background: {
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+            },
+
+            tooltip: {
+                enabled: true
+            },
+
+            // the value axis
+            yAxis: {
+                        stops: [
+                                [0.1, '#55BF3B'], // green
+                        [0.5, '#DDDF0D'], // yellow
+                        [0.9, '#DF5353'] // red
+                        ],
+                        lineWidth: 0,
+            minorTickInterval: null,
+            tickPixelInterval: 400,
+            tickWidth: 0,
+                title: {
+                y: -70
+                },
+            labels: {
+                y: 16
+            }
+            },
+
+        plotOptions: {
+            solidgauge: {
+                dataLabels: {
+                    y: 5,
+                    borderWidth: 0,
+                    useHTML: true
+                }
+            }
+        }
+    };
+	// The speed gauge
+    $('#current-outside-temp').highcharts(Highcharts.merge(gaugeOptions, {
+        yAxis: {
+                min: -32,
+                max: 120,
+                title: {
+                    text: ''
+                }
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            series: [{
+                name: 'Outside Temperature',
+                data: [{{ otCurrent }}],
+                tooltip: {
+                        valueSuffix: 'F'
+                }
+            }]
+
+        }));
+                };
+
+		function makeCurrentPressure() {
+			var gaugeOptions = {
+	
+	    chart: {
+	        type: 'solidgauge'
+	    },
+	    
+	    title: null,
+	    
+	    pane: {
+	    	center: ['50%', '85%'],
+	    	size: '95%',
+	        startAngle: -90,
+	        endAngle: 90,
+            background: {
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+	    },
+
+	    tooltip: {
+	    	enabled: true
+	    },
+	       
+	    // the value axis
+	    yAxis: {
+			stops: [
+				[0.1, '#55BF3B'], // green
+	        	[0.5, '#DDDF0D'], // yellow
+	        	[0.9, '#DF5353'] // red
+			],
+			lineWidth: 0,
+            minorTickInterval: null,
+            tickPixelInterval: 400,
+            tickWidth: 0,
+	        title: {
+                y: -70
+	        },
+            labels: {
+                y: 16
+            }        
+	    },
+        
+        plotOptions: {
+            solidgauge: {
+                dataLabels: {
+                    y: 5,
+                    borderWidth: 0,
+                    useHTML: true
+                }
+            }
+        }
+    };
+    
+    // The speed gauge
+    $('#current-pressure').highcharts(Highcharts.merge(gaugeOptions, {
+        yAxis: {
+	        min: 980,
+	        max: 1050,
+	        title: {
+	            text: ''
+	        }       
+	    },
+
+	    credits: {
+	    	enabled: false
+	    },
+	
+	    series: [{
+	        name: 'Pressure',
+	        data: [{{ pCurrent }}],
+	        tooltip: {
+			valueSuffix: ' mPa'
+		}
+	    }]
+	
+	}));
+		};
+	</script>
 </head>
 <body>
+<script type="text/javascript" src="{{ url_for('static',filename='js/highcharts.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='js/modules/exporting.js') }}"></script>
+    <script type="text/javascript" src="/static/js/themes/dark-unica.js"></script>
+    <script src="http://code.highcharts.com/highcharts-more.js"></script>
+	<script src="http://code.highcharts.com/modules/solid-gauge.src.js"></script>
 
     <div id="wrapper">
 
@@ -46,6 +298,7 @@
                 <ul id="active" class="nav navbar-nav side-nav">
                     <li class="selected"><a href="/dashboard"><i class="fa fa-bullseye"></i> Dashboard</a></li>
                     <li><a href="/graphs"><i class="glyphicon glyphicon-stats"></i> Graphs</a></li>
+		    <li><a href="/utils/outliers"><i class="glyphicon glyphicon-minus"></i> Remove Outliers</a></li>
 		    <li><a href="https://andromeda.pettitservers.com:8080/nagios3"><i class="glyphicon glyphicon-eye-open"></i> Nagios</a></li>
 		    <li><a href="https://jpet.us/rc"><i class="glyphicon glyphicon-envelope"></i> Webmail</a></li>
 		    <li><a href="https://jpet.us/oc"><i class="glyphicon glyphicon-cloud"></i> ownCloud</a></li>
@@ -54,7 +307,32 @@
         </nav>
 
         <div id="page-wrapper">
-
+		<div class="row">
+			<div class="col-lg-4">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title"><i class="glyphicon glyphicon-dashboard"></i> Current Pressure</h3>
+					</div>
+					<div id="current-pressure"></div>
+				</div>
+			</div>
+			<div class="col-lg-4">
+                                <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                                <h3 class="panel-title"><i class="glyphicon glyphicon-dashboard"></i> Current Outside Temperature</h3>
+                                        </div>
+					<div id="current-outside-temp"></div>
+                                </div>
+                        </div>
+			<div class="col-lg-4">
+                                <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                                <h3 class="panel-title"><i class="glyphicon glyphicon-dashboard"></i> Current Outside Humidity</h3>
+                                        </div>
+					<div id="current-outside-humidity"></div>
+                                </div>
+                        </div>
+		</div>
             <div class="row">
 		<div class="col-lg-4">
                                 <div class="panel panel-primary">

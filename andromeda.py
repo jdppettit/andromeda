@@ -304,7 +304,7 @@ def stripOutliers(queryItem, itemType, magnitude):
 	stdevh = 0
 	counter = 0
 	if itemType == "temp":
-		ean, length = getTemperatureMean(queryItem)
+		mean, length = getTemperatureMean(queryItem)
 		stdevh = std(list(item.temp for item in queryItem))
 	        effectivestdev = stdevh * magnitude
 		for item in queryItem:
@@ -380,7 +380,7 @@ def graphs():
 	bt24hr, bh24hr, ot24hr, oh24hr, ct24hr, ht24hr, p24hr = getAllRecordsFiltered(24)
 	bt7day, bh7day, ot7day, oh7day, ct7day, ht7day, p7day = getAllRecordsFiltered(168)
 	
-	return render_template("graphs.html", pressure6hr = p6hr, pressure24hr = p24hr, pressure7day = p7day, bt6hr = bt6hr, bt24hr = bt24hr, bt7day = bt7day)
+	return render_template("graphs.html", pressure6hr = p6hr, pressure24hr = p24hr, pressure7day = p7day, bt6hr = bt6hr, bt24hr = bt24hr, bt7day = bt7day, ot6hr = ot6hr, ot24hr = ot24hr, ot7day = ot7day)
 
 @app.route('/dashboard')
 @app.route('/')
@@ -423,8 +423,10 @@ def outliers():
 	bb, ba, bc, bd, be, bf, p = getAllRecords()
 
 	ctPressure = stripOutliers(p, "pressure", 1)
+	#ctot = stripOutliers(ot, "temp", 1)
+	#ctbt = stripOutliers(bt, "temp", 1)
 
-	return "Deleted %i rows" % ctPressure
+	return "Deleted %i pressure rows" % (ctPressure)
 	
 if __name__ == '__main__':
         app.run(host='0.0.0.0', port=80, debug=True)

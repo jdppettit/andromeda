@@ -28,7 +28,102 @@
 		makebt7day();
 		makebt24hr();
 		makebt6hr();
+		makeot6hr();
+		makeot24hr();
+		makeot7day();
 	});
+	function makeot24hr() {
+                var dataVar = [{% for row in ot24hr %}{{ row.temp }},{% endfor %}];
+                var datesVar = [{% for row in ot24hr %}"{{ row.date }}",{% endfor %}];
+                $("#ot-24-hr").highcharts({
+                title: {
+                        text: ""
+                },
+                xAxis: {
+                        categories: datesVar,
+                                labels: {
+                                        staggerLines: 5,
+                                        enabled: false
+                                },
+                                tickInterval: 3600 * 1000
+                },
+                yAxis: {
+                        title: {
+                                text: "Temperature (F)"
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                },
+                series: [{
+                        name: 'Temperature',
+                        data: dataVar
+                }]
+                });
+        };
+	function makeot7day() {
+                var dataVar = [{% for row in ot7day %}{{ row.temp }},{% endfor %}];
+                var datesVar = [{% for row in ot7day %}"{{ row.date }}",{% endfor %}];
+                $("#ot-7-day").highcharts({
+                title: {
+                        text: ""
+                },
+                xAxis: {
+                        categories: datesVar,
+                                labels: {
+                                        staggerLines: 5,
+                                        enabled: false
+                                },
+                                tickInterval: 3600 * 1000
+                },
+                yAxis: {
+                        title: {
+                                text: "Temperature (F)"
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                },
+                series: [{
+                        name: 'Temperature',
+                        data: dataVar
+                }]
+                });
+        };
+	function makeot6hr() {
+                var dataVar = [{% for row in ot6hr %}{{ row.temp }},{% endfor %}];
+                var datesVar = [{% for row in ot6hr %}"{{ row.date }}",{% endfor %}];
+                $("#ot-6-hr").highcharts({
+                title: {
+                        text: ""
+                },
+                xAxis: {
+                        categories: datesVar,
+                                labels: {
+                                        staggerLines: 5,
+                                        enabled: false
+                                }
+                },
+                yAxis: {
+                        title: {
+                                text: "Temperature (F)"
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                },
+                series: [{
+                        name: 'Temperature',
+                        data: dataVar
+                }]
+                });
+        };
 	function makebt7day() {
                 var dataVar = [{% for row in bt7day %}{{ row.temp }},{% endfor %}];
                 var datesVar = [{% for row in bt7day %}"{{ row.date }}",{% endfor %}];
@@ -245,6 +340,7 @@
                 <ul id="active" class="nav navbar-nav side-nav">
                     <li><a href="/dashboard"><i class="fa fa-bullseye"></i> Dashboard</a></li>
                     <li class="selected"><a href="/graphs"><i class="glyphicon glyphicon-stats"></i> Graphs</a></li>
+		    <li><a href="/utils/outliers"><i class="glyphicon glyphicon glyphicon-minus"></i> Remove Outliers</a></li>
 		    <li><a href="https://andromeda.pettitservers.com:8080/nagios3"><i class="glyphicon glyphicon-eye-open"></i> Nagios</a></li>
 		    <li><a href="https://jpet.us/rc"><i class="glyphicon glyphicon-envelope"></i> Webmail</a></li>
 		    <li><a href="https://jpet.us/oc"><i class="glyphicon glyphicon-cloud"></i> ownCloud</a></li>
@@ -280,6 +376,32 @@
                         </div>
                 </div>
 	</div>
+	<div class="row">
+                <div class="col-lg-4">
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                        <h3 class="panel-title">Outside Temperature - 6 Hour</h3>
+                                </div>
+                                <div id="ot-6-hr"></div>
+                        </div>
+                </div>
+                <div class="col-lg-4">
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                        <h3 class="panel-title">Outside Temperature - 24 Hour</h3>
+                                </div>
+                                <div id="ot-24-hr"></div>
+                        </div>
+                </div>
+                <div class="col-lg-4">
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                        <h3 class="panel-title">Outside Temperature - 7 Days</h3>
+                                </div>
+                                <div id="ot-7-day"></div>
+                        </div>
+                </div>
+        </div>
 		<div class="row">
                 <div class="col-lg-4">
                         <div class="panel panel-primary">
