@@ -25,7 +25,102 @@
 		makePressure6hr();
 		makePressure24hr();
 		makePressure7day();
-	});	
+		makebt7day();
+		makebt24hr();
+		makebt6hr();
+	});
+	function makebt7day() {
+                var dataVar = [{% for row in bt7day %}{{ row.temp }},{% endfor %}];
+                var datesVar = [{% for row in bt7day %}"{{ row.date }}",{% endfor %}];
+                $("#bt-7-day").highcharts({
+                title: {
+                        text: ""
+                },
+                xAxis: {
+                        categories: datesVar,
+                                labels: {
+                                        staggerLines: 5,
+                                        enabled: false
+                                },
+				tickInterval: 3600 * 1000
+                },
+                yAxis: {
+                        title: {
+                                text: "Temperature (F)"
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                },
+                series: [{
+                        name: 'Temperature',
+                        data: dataVar
+                }]
+                });
+        };
+	function makebt24hr() {
+                var dataVar = [{% for row in bt24hr %}{{ row.temp }},{% endfor %}];
+                var datesVar = [{% for row in bt24hr %}"{{ row.date }}",{% endfor %}];
+                $("#bt-24-hr").highcharts({
+                title: {
+                        text: ""
+                },
+                xAxis: {
+                        categories: datesVar,
+                                labels: {
+                                        staggerLines: 5,
+                                        enabled: false
+                                },
+				tickInterval: 3600 * 1000
+                },
+                yAxis: {
+                        title: {
+                                text: "Temperature (F)"
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                },
+                series: [{
+                        name: 'Temperature',
+                        data: dataVar
+                }]
+                });
+        };
+	function makebt6hr() {
+                var dataVar = [{% for row in bt6hr %}{{ row.temp }},{% endfor %}];
+                var datesVar = [{% for row in bt6hr %}"{{ row.date }}",{% endfor %}];
+                $("#bt-6-hr").highcharts({
+                title: {
+                        text: ""
+                },
+                xAxis: {
+                        categories: datesVar,
+                                labels: {
+                                        staggerLines: 5,
+                                        enabled: false
+                                }
+                },
+                yAxis: {
+                        title: {
+                                text: "Temperature (F)"
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                },
+                series: [{
+                        name: 'Temperature',
+                        data: dataVar
+                }]
+                });
+        };	
 	function makePressure6hr() {
 		var dataVar = [{% for row in pressure6hr %}{{ row.pressure }},{% endfor %}];
                 var datesVar = [{% for row in pressure6hr %}"{{ row.date }}",{% endfor %}];
@@ -182,6 +277,32 @@
                                         <h3 class="panel-title">Pressure - 7 Days</h3>
                                 </div>
                                 <div id="pressure-7-day"></div>
+                        </div>
+                </div>
+	</div>
+		<div class="row">
+                <div class="col-lg-4">
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                        <h3 class="panel-title">Bedroom Temperature - 6 Hour</h3>
+                                </div>
+                                <div id="bt-6-hr"></div>
+                        </div>
+                </div>
+                <div class="col-lg-4">
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                        <h3 class="panel-title">Bedroom Temperature - 24 Hour</h3>
+                                </div>
+                                <div id="bt-24-hr"></div>
+                        </div>
+                </div>
+                <div class="col-lg-4">
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                        <h3 class="panel-title">Bedroom Temperature - 7 Days</h3>
+                                </div>
+                                <div id="bt-7-day"></div>
                         </div>
                 </div>
 	    </div>

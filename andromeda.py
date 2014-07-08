@@ -256,6 +256,18 @@ def getAllPressure(hrs):
         allPressure = Pressure.query.filter(Pressure.date>=time).order_by(Pressure.pressure.asc()).all()
         return allPressure
 
+def getAllRecordsFiltered(hrs):
+	time = datetime.datetime.now() - datetime.timedelta(hours=hrs)
+	bt = BedroomTemperature.query.filter(BedroomTemperature.date>=time).all()
+        bh = BedroomHumidity.query.filter(BedroomHumidity.date>=time).all()
+        ot = OutsideTemperature.query.filter(OutsideTemperature.date>=time).all()
+        oh = OutsideHumidity.query.filter(OutsideHumidity.date>=time).all()
+        ct = ClosetTemperature.query.filter(ClosetTemperature.date>=time).all()
+        ht = HouseTemperature.query.filter(HouseTemperature.date>=time).all()
+        p = Pressure.query.filter(Pressure.date>=time).all()
+
+        return bt, bh, ot, oh, ct, ht, p
+
 def getAllRecords():
 	bt = BedroomTemperature.query.all()
 	bh = BedroomHumidity.query.all()
@@ -289,12 +301,12 @@ def getPressureTrend():
 		return 2
 
 def stripOutliers(queryItem, itemType, magnitude):
-	mean, length = getTemperatureMean(queryItem)
 	stdevh = 0
-        stdevh = std(queryItem)
-        effectivestdev = stdevh * magnitude
 	counter = 0
 	if itemType == "temp":
+		ean, length = getTemperatureMean(queryItem)
+		stdevh = std(list(item.temp for item in queryItem))
+	        effectivestdev = stdevh * magnitude
 		for item in queryItem:
 			if item.temp > mean + effectivestdev or item.temp < mean - effectivestdev:
 				pass
@@ -304,6 +316,9 @@ def stripOutliers(queryItem, itemType, magnitude):
 		db.session.commit()
 		return counter
 	elif itemType == "humidity":
+		ean, length = getHumidityMean(queryItem)
+		stdevh = std(list(item.humidity for item in queryItem))
+	        effectivestdev = stdevh * magnitude
 		for item in queryItem:
 			if item.humidity > mean + effectivestdev or item.humidity < mean - effectivestdev:
 				pass
@@ -313,8 +328,11 @@ def stripOutliers(queryItem, itemType, magnitude):
 		db.session.commit()
 		return counter
 	elif itemType == "pressure":
+		ean, length = getPressureMean(queryItem)
+		stdevh = std(list(item.pressure for item in queryItem))
+	        effectivestdev = stdevh * magnitude
 		for item in queryItem:
-                        if item.pressure > mean + effectivestdev or item.humidity < mean - effectivestdev:
+                        if item.pressure != 0:
                                 pass
                         else:
                                 db.session.delete(item)
@@ -358,10 +376,11 @@ def getNagiosJSON():
 @app.route('/graphs')
 @requires_auth
 def graphs():
-	pressure6hr = getAllPressure(6)
-	pressure24hr = getAllPressure(24)
-	pressure7day = getAllPressure(168)
-	return render_template("graphs.html", pressure6hr = pressure6hr, pressure24hr = pressure24hr, pressure7day = pressure7day)
+	bt6hr, bh6hr, ot6hr, oh6hr, ct6hr, ht6hr, p6hr = getAllRecordsFiltered(6)
+	bt24hr, bh24hr, ot24hr, oh24hr, ct24hr, ht24hr, p24hr = getAllRecordsFiltered(24)
+	bt7day, bh7day, ot7day, oh7day, ct7day, ht7day, p7day = getAllRecordsFiltered(168)
+	
+	return render_template("graphs.html", pressure6hr = p6hr, pressure24hr = p24hr, pressure7day = p7day, bt6hr = bt6hr, bt24hr = bt24hr, bt7day = bt7day)
 
 @app.route('/dashboard')
 @app.route('/')
@@ -400,11 +419,12 @@ def index():
 @app.route('/utils/outliers')
 @requires_auth
 def outliers():
-	bt, bh, ot, oh, ct, ht, p = getAllRecords()
-	
-	btCount = stripOutliers(bt, "temp", 1)
+	bt, bh, ot, oh, ct, ht, pa = getAllRecordsFiltered(24)
+	bb, ba, bc, bd, be, bf, p = getAllRecords()
 
-	return "Deleted %i rows" % btCount
+	ctPressure = stripOutliers(p, "pressure", 1)
+
+	return "Deleted %i rows" % ctPressure
 	
 if __name__ == '__main__':
         app.run(host='0.0.0.0', port=80, debug=True)
